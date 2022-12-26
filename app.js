@@ -5,11 +5,12 @@ const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const cors = require('cors')
 
-const indexRouter = require('./routes/index')
-const usersRouter = require('./routes/users')
+const userRouter = require('./routes/user/router')
 
 const app = express()
 app.use(cors())
+
+const URL = '/api/v1'
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
@@ -21,8 +22,14 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/', indexRouter)
-app.use('/users', usersRouter)
+app.use(`${URL}/user`, userRouter)
+
+app.use('/', (req, res) => {
+  return res.status(200).json({
+    status: 200,
+    message: 'Server Is Running Well'
+  })
+})
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
