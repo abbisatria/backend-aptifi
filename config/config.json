@@ -1,11 +1,11 @@
 {
   "development": {
-    "username": "abbi",
-    "password": "abbi",
-    "database": "aptifi",
-    "host": "127.0.0.1",
+    "username": "postgres",
+    "password": "password",
+    "database": "postgres",
+    "host": "103.55.36.10",
     "dialect": "postgres",
-    "port": 5432
+    "port": 5433
   },
   "test": {
     "username": "root",

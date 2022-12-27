@@ -19,7 +19,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       organization_number: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       phone_number: {
         type: Sequelize.STRING
@@ -34,7 +34,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       nik: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       city_birth: {
         type: Sequelize.STRING

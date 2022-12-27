@@ -3,54 +3,139 @@ const { User } = require('../../models')
 const { Op } = require('sequelize')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const path = require('path')
+const fs = require('fs')
 
 module.exports = {
   createUser: async (req, res) => {
     try {
       const payload = req.body
 
-      const existingUser = await User.findOne({ where: { name: payload.name } })
+      const existingUser = await User.findOne({ where: { username: payload.username } })
 
       if (!existingUser) {
         const salt = await bcrypt.genSalt()
         const encryptedPassword = payload.password ? await bcrypt.hash(payload.password, salt) : ''
-        const result = await User.create({ ...payload, password: encryptedPassword })
-        if (result) {
-          return response(res, 200, true, 'User berhasil dibuat')
+        if (req.files) {
+          let proofPayment
+          let ijazah
+          if (req.files.ijazah) {
+            const tmpPathIjazah = req.files.ijazah[0].path
+            const originalExtIjazah = req.files.ijazah[0].originalname.split('.')[req.files.ijazah[0].originalname.split('.').length - 1]
+            ijazah = req.files.ijazah[0].filename + '.' + originalExtIjazah
+            const targetPathIjazah = path.resolve(path.resolve(__dirname, '../../'), `public/images/ijazah/${ijazah}`)
+
+            const srcIjazah = fs.createReadStream(tmpPathIjazah)
+            const destIjazah = fs.createWriteStream(targetPathIjazah)
+
+            srcIjazah.pipe(destIjazah)
+          }
+          if (req.files.proof_payment) {
+            const tmpPathPhoto = req.files.proof_payment[0].path
+            const originalExtPhoto = req.files.proof_payment[0].originalname.split('.')[req.files.proof_payment[0].originalname.split('.').length - 1]
+            proofPayment = req.files.proof_payment[0].filename + '.' + originalExtPhoto
+            const targetPathPhoto = path.resolve(path.resolve(__dirname, '../../'), `public/images/photo/${proofPayment}`)
+
+            const srcPhoto = fs.createReadStream(tmpPathPhoto)
+            const destPhoto = fs.createWriteStream(targetPathPhoto)
+
+            srcPhoto.pipe(destPhoto)
+          }
+
+          const result = await User.create({ ...payload, ijazah, proof_payment: proofPayment, password: encryptedPassword })
+          if (result) {
+            return response(res, 200, true, 'User berhasil dibuat')
+          } else {
+            return response(res, 400, false, 'User gagal dibuat')
+          }
         } else {
-          return response(res, 400, false, 'User gagal dibuat')
+          const result = await User.create({ ...payload, password: encryptedPassword })
+          if (result) {
+            return response(res, 200, true, 'User berhasil register')
+          } else {
+            return response(res, 400, false, 'User gagal register')
+          }
         }
       } else {
         return response(res, 400, false, 'User sudah terdaftar')
       }
     } catch (err) {
+      console.log('err', err)
       return response(res, 400, false, `${err.message || 'Bad Request'}`)
     }
   },
   updateUser: async (req, res) => {
     try {
-      const payload = req.body
+      let payload = req.body
+      const { id } = req.params
 
-      const existingUser = await User.findOne({ where: { id: req.userData.id } })
+      const isExists = await User.findOne({ where: { id } })
 
-      if (existingUser) {
-        const salt = await bcrypt.genSalt()
-        const encryptedPassword = payload.password ? await bcrypt.hash(payload.password, salt) : ''
-        let result
-        if (encryptedPassword) {
-          result = await User.update({ ...payload, password: encryptedPassword }, { where: { id: req.userData.id } })
-        } else {
-          result = await User.update(payload, { where: { id: req.userData.id } })
+      if (isExists) {
+        if (payload.password) {
+          const salt = await bcrypt.genSalt()
+          const encryptedPassword = await bcrypt.hash(payload.password, salt)
+          payload = { ...payload, password: encryptedPassword }
         }
-        if (result) {
-          return response(res, 200, true, 'User berhasil diupdate')
+        if (req.files) {
+          let proofPayment
+          let ijazah
+          if (req.files.ijazah) {
+            const tmpPathIjazah = req.files.ijazah[0].path
+            const originalExtIjazah = req.files.ijazah[0].originalname.split('.')[req.files.ijazah[0].originalname.split('.').length - 1]
+            ijazah = req.files.ijazah[0].filename + '.' + originalExtIjazah
+            const targetPathIjazah = path.resolve(path.resolve(__dirname, '../../'), `public/images/ijazah/${ijazah}`)
+
+            const srcIjazah = fs.createReadStream(tmpPathIjazah)
+            const destIjazah = fs.createWriteStream(targetPathIjazah)
+
+            payload = { ...payload, ijazah }
+            srcIjazah.pipe(destIjazah)
+            srcIjazah.on('end', () => {
+              const currentImage = path.resolve(path.resolve(__dirname, '../../'), `public/images/ijazah/${isExists.ijazah}`)
+              if (fs.existsSync(currentImage)) {
+                fs.unlinkSync(currentImage)
+              }
+            })
+          }
+          if (req.files.proof_payment) {
+            const tmpPathPhoto = req.files.proof_payment[0].path
+            const originalExtPhoto = req.files.proof_payment[0].originalname.split('.')[req.files.proof_payment[0].originalname.split('.').length - 1]
+            proofPayment = req.files.proof_payment[0].filename + '.' + originalExtPhoto
+            const targetPathPhoto = path.resolve(path.resolve(__dirname, '../../'), `public/images/photo/${proofPayment}`)
+
+            const srcPhoto = fs.createReadStream(tmpPathPhoto)
+            const destPhoto = fs.createWriteStream(targetPathPhoto)
+
+            payload = { ...payload, proof_payment: proofPayment }
+            srcPhoto.pipe(destPhoto)
+            srcPhoto.on('end', () => {
+              const currentImage = path.resolve(path.resolve(__dirname, '../../'), `public/images/photo/${isExists.proof_payment}`)
+              if (fs.existsSync(currentImage)) {
+                fs.unlinkSync(currentImage)
+              }
+            })
+          }
+
+          const result = await User.update(payload, { where: { id } })
+          if (result) {
+            return response(res, 200, true, 'User Berhasil diupdate')
+          } else {
+            return response(res, 400, false, 'User gagal diupdate')
+          }
         } else {
-          return response(res, 400, false, 'User gagal diupdate')
+          const result = await User.update(payload, { where: { id } })
+          if (result) {
+            return response(res, 200, true, 'User Berhasil diupdate')
+          } else {
+            return response(res, 400, false, 'User gagal diupdate')
+          }
         }
       } else {
-        return response(res, 404, false, 'User tidak ditemukan')
+        return response(res, 400, false, 'User tidak ditemukan')
       }
     } catch (err) {
+      console.log('err', err)
       return response(res, 400, false, `${err.message || 'Bad Request'}`)
     }
   },
@@ -67,7 +152,7 @@ module.exports = {
       } else {
         const result = await User.findAndCountAll({
           where: {
-            name: {
+            fullname: {
               [Op.like]: `%${search}%`
             }
           },
@@ -96,6 +181,15 @@ module.exports = {
 
       if (existingUser) {
         await User.destroy({ where: { id } })
+        const currentIjazah = path.resolve(path.resolve(__dirname, '../../'), `public/images/ijazah/${existingUser.ijazah}`)
+        if (fs.existsSync(currentIjazah)) {
+          fs.unlinkSync(currentIjazah)
+        }
+
+        const currentPhoto = path.resolve(path.resolve(__dirname, '../../'), `public/images/photo/${existingUser.proof_payment}`)
+        if (fs.existsSync(currentPhoto)) {
+          fs.unlinkSync(currentPhoto)
+        }
 
         return response(res, 200, true, 'User berhasil dihapus')
       } else {

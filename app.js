@@ -6,6 +6,11 @@ const logger = require('morgan')
 const cors = require('cors')
 
 const userRouter = require('./routes/user/router')
+const identityRouter = require('./routes/identity/router')
+const newsRouter = require('./routes/news/router')
+const publicationRouter = require('./routes/publication/router')
+const regulationRouter = require('./routes/regulation/router')
+const downloadRouter = require('./routes/download/router')
 
 const app = express()
 app.use(cors())
@@ -23,6 +28,11 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use(`${URL}/user`, userRouter)
+app.use(`${URL}/identity`, identityRouter)
+app.use(`${URL}/news`, newsRouter)
+app.use(`${URL}/publication`, publicationRouter)
+app.use(`${URL}/regulation`, regulationRouter)
+app.use(`${URL}/download`, downloadRouter)
 
 app.use('/', (req, res) => {
   return res.status(200).json({

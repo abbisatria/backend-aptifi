@@ -1,12 +1,14 @@
 const express = require('express')
+const multer = require('multer')
 const { authCheck } = require('../../helpers/auth')
 const { getListUser, createUser, updateUser, deleteUser, login } = require('./controller')
 const route = express.Router()
+const os = require('os')
 
 route.get('', authCheck, getListUser)
-route.post('', createUser)
+route.post('', authCheck, multer({ dest: os.tmpdir() }).fields([{ name: 'ijazah' }, { name: 'proof_payment' }]), createUser)
 route.post('/login', login)
-route.put('', authCheck, updateUser)
+route.put('/:id', authCheck, multer({ dest: os.tmpdir() }).fields([{ name: 'ijazah' }, { name: 'proof_payment' }]), updateUser)
 route.delete('/:id', authCheck, deleteUser)
 
 module.exports = route
