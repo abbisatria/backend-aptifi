@@ -3,7 +3,7 @@ const { getListRegulation, createRegulation, updateRegulation, deleteRegulation 
 const { authCheck } = require('../../helpers/auth')
 const route = express.Router()
 
-route.get('', authCheck, getListRegulation)
+route.get('', getListRegulation)
 route.post('', authCheck, createRegulation)
 route.put('/:id', authCheck, updateRegulation)
 route.delete('/:id', authCheck, deleteRegulation)

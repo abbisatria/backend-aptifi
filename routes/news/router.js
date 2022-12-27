@@ -3,7 +3,7 @@ const { getListNews, createNews, updateNews, deleteNews } = require('./controlle
 const { authCheck } = require('../../helpers/auth')
 const route = express.Router()
 
-route.get('', authCheck, getListNews)
+route.get('', getListNews)
 route.post('', authCheck, createNews)
 route.put('/:id', authCheck, updateNews)
 route.delete('/:id', authCheck, deleteNews)

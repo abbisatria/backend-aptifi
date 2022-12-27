@@ -3,7 +3,7 @@ const { getListDownload, createDownload, updateDownload, deleteDownload } = requ
 const { authCheck } = require('../../helpers/auth')
 const route = express.Router()
 
-route.get('', authCheck, getListDownload)
+route.get('', getListDownload)
 route.post('', authCheck, createDownload)
 route.put('/:id', authCheck, updateDownload)
 route.delete('/:id', authCheck, deleteDownload)

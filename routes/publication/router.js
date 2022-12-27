@@ -5,7 +5,7 @@ const route = express.Router()
 const multer = require('multer')
 const os = require('os')
 
-route.get('', authCheck, getListPublication)
+route.get('', getListPublication)
 route.post('', authCheck, multer({ dest: os.tmpdir() }).single('image'), createPublication)
 route.put('/:id', authCheck, multer({ dest: os.tmpdir() }).single('image'), updatePublication)
 route.delete('/:id', authCheck, deletePublication)

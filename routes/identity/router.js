@@ -6,6 +6,6 @@ const route = express.Router()
 const os = require('os')
 
 route.post('', authCheck, multer({ dest: os.tmpdir() }).single('image'), createIdentity)
-route.get('', authCheck, detailIdentity)
+route.get('', detailIdentity)
 
 module.exports = route
