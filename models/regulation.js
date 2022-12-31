@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate (models) {
       // define association here
+      Regulation.belongsTo(models.Subcategory, { foreignKey: 'type' })
     }
   }
   Regulation.init({

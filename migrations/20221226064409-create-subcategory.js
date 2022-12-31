@@ -2,14 +2,23 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('Banners', {
+    await queryInterface.createTable('Subcategories', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      image: {
+      id_category: {
+        allowNull: false,
+        onDelete: 'SET NULL',
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Categories',
+          key: 'id'
+        }
+      },
+      name: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -23,6 +32,6 @@ module.exports = {
     })
   },
   async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('Banners')
+    await queryInterface.dropTable('Subcategories')
   }
 }

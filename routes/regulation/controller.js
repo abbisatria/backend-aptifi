@@ -1,5 +1,5 @@
 const response = require('../../helpers/response')
-const { Regulation } = require('../../models')
+const { Regulation, Subcategory } = require('../../models')
 const { Op } = require('sequelize')
 
 module.exports = {
@@ -51,16 +51,19 @@ module.exports = {
       const offset = (Number(page) > 1) ? (Number(page) * limit) - limit : 0
 
       if (all) {
-        const result = await Regulation.findAll()
+        const result = await Subcategory.findAll({ include: [{ model: Regulation }], where: { id_category: 1 }, attributes: ['name'] })
 
         return response(res, 200, true, 'List Regulasi', result)
       } else {
-        const result = await Regulation.findAndCountAll({
+        const result = await Subcategory.findAndCountAll({
           where: {
             name: {
               [Op.iLike]: `%${search}%`
-            }
+            },
+            id_category: 1
           },
+          include: [{ model: Regulation }],
+          attributes: ['name'],
           order: [['id', 'DESC']],
           limit: Number(limit),
           offset: Number(offset)

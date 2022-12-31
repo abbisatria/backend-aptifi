@@ -10,7 +10,13 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       type: {
-        type: Sequelize.INTEGER
+        allowNull: false,
+        onDelete: 'SET NULL',
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Subcategories',
+          key: 'id'
+        }
       },
       name: {
         type: Sequelize.STRING

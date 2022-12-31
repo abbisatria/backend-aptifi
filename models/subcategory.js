@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize')
 module.exports = (sequelize, DataTypes) => {
-  class Download extends Model {
+  class Subcategory extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,16 +11,17 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate (models) {
       // define association here
-      Download.belongsTo(models.Subcategory, { foreignKey: 'type' })
+      Subcategory.belongsTo(models.Category, { foreignKey: 'id_category' })
+      Subcategory.hasMany(models.Download, { foreignKey: 'type' })
+      Subcategory.hasMany(models.Regulation, { foreignKey: 'type' })
     }
   }
-  Download.init({
-    type: DataTypes.INTEGER,
-    name: DataTypes.STRING,
-    link: DataTypes.STRING
+  Subcategory.init({
+    id_category: DataTypes.INTEGER,
+    name: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'Download'
+    modelName: 'Subcategory'
   })
-  return Download
+  return Subcategory
 }

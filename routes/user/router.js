@@ -6,7 +6,7 @@ const route = express.Router()
 const os = require('os')
 
 route.get('', authCheck, getListUser)
-route.post('', authCheck, multer({ dest: os.tmpdir() }).fields([{ name: 'ijazah' }, { name: 'proof_payment' }]), createUser)
+route.post('', multer({ dest: os.tmpdir() }).fields([{ name: 'ijazah' }, { name: 'proof_payment' }]), createUser)
 route.post('/login', login)
 route.put('/:id', authCheck, multer({ dest: os.tmpdir() }).fields([{ name: 'ijazah' }, { name: 'proof_payment' }]), updateUser)
 route.delete('/:id', authCheck, deleteUser)

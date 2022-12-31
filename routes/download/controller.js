@@ -1,5 +1,5 @@
 const response = require('../../helpers/response')
-const { Download } = require('../../models')
+const { Download, Subcategory } = require('../../models')
 const { Op } = require('sequelize')
 
 module.exports = {
@@ -51,17 +51,20 @@ module.exports = {
       const offset = (Number(page) > 1) ? (Number(page) * limit) - limit : 0
 
       if (all) {
-        const result = await Download.findAll()
+        const result = await Subcategory.findAll({ include: [{ model: Download }], where: { id_category: 2 }, attributes: ['name'] })
 
         return response(res, 200, true, 'List Download', result)
       } else {
-        const result = await Download.findAndCountAll({
+        const result = await Subcategory.findAndCountAll({
           where: {
             name: {
               [Op.iLike]: `%${search}%`
-            }
+            },
+            id_category: 2
           },
+          include: [{ model: Download }],
           order: [['id', 'DESC']],
+          attributes: ['name'],
           limit: Number(limit),
           offset: Number(offset)
         })

@@ -11,6 +11,8 @@ const newsRouter = require('./routes/news/router')
 const publicationRouter = require('./routes/publication/router')
 const regulationRouter = require('./routes/regulation/router')
 const downloadRouter = require('./routes/download/router')
+const categoryRouter = require('./routes/category/router')
+const subCategoryRouter = require('./routes/subcategory/router')
 
 const app = express()
 app.use(cors())
@@ -33,6 +35,8 @@ app.use(`${URL}/news`, newsRouter)
 app.use(`${URL}/publication`, publicationRouter)
 app.use(`${URL}/regulation`, regulationRouter)
 app.use(`${URL}/download`, downloadRouter)
+app.use(`${URL}/category`, categoryRouter)
+app.use(`${URL}/subcategory`, subCategoryRouter)
 
 app.use('/', (req, res) => {
   return res.status(200).json({

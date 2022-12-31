@@ -44,6 +44,21 @@ module.exports = {
       return response(res, 400, false, `${err.message || 'Bad Request'}`)
     }
   },
+  getDetailNews: async (req, res) => {
+    try {
+      const { id } = req.params
+
+      const existingNews = await News.findOne({ where: { id } })
+
+      if (existingNews) {
+        return response(res, 200, true, 'Detial Berita', existingNews)
+      } else {
+        return response(res, 404, false, 'Berita tidak ditemukan')
+      }
+    } catch (err) {
+      return response(res, 400, false, `${err.message || 'Bad Request'}`)
+    }
+  },
   getListNews: async (req, res) => {
     try {
       const { page = 1, limit = 4, search = '', all = false } = req.query
@@ -51,7 +66,7 @@ module.exports = {
       const offset = (Number(page) > 1) ? (Number(page) * limit) - limit : 0
 
       if (all) {
-        const result = await News.findAll()
+        const result = await News.findAll({ attributes: ['title', 'sub_title', 'news_date'] })
 
         return response(res, 200, true, 'List Berita', result)
       } else {
@@ -63,7 +78,8 @@ module.exports = {
           },
           order: [['id', 'DESC']],
           limit: Number(limit),
-          offset: Number(offset)
+          offset: Number(offset),
+          attributes: ['title', 'sub_title', 'news_date']
         })
 
         const finalResult = {
