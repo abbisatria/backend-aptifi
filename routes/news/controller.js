@@ -1,6 +1,8 @@
 const response = require('../../helpers/response')
 const { News } = require('../../models')
 const { Op } = require('sequelize')
+const path = require('path')
+const fs = require('fs')
 
 module.exports = {
   createNews: async (req, res) => {
@@ -10,11 +12,31 @@ module.exports = {
       const existingNews = await News.findOne({ where: { title: payload.title } })
 
       if (!existingNews) {
-        const result = await News.create(payload)
-        if (result) {
-          return response(res, 200, true, 'Berita berhasil dibuat')
+        if (req.file) {
+          const tmpPathPhoto = req.file.path
+          const originalExtPhoto = req.file.originalname.split('.')[req.file.originalname.split('.').length - 1]
+          const photo = req.file.filename + '.' + originalExtPhoto
+          const targetPathPhoto = path.resolve(path.resolve(__dirname, '../../'), `public/images/berita/${photo}`)
+
+          const srcPhoto = fs.createReadStream(tmpPathPhoto)
+          const destPhoto = fs.createWriteStream(targetPathPhoto)
+
+          srcPhoto.pipe(destPhoto)
+          srcPhoto.on('end', async () => {
+            const result = await News.create({ ...payload, image: photo })
+            if (result) {
+              return response(res, 200, true, 'Berita berhasil dibuat')
+            } else {
+              return response(res, 400, false, 'Berita gagal dibuat')
+            }
+          })
         } else {
-          return response(res, 400, false, 'Berita gagal dibuat')
+          const result = await News.create(payload)
+          if (result) {
+            return response(res, 200, true, 'Berita berhasil dibuat')
+          } else {
+            return response(res, 400, false, 'Berita gagal dibuat')
+          }
         }
       } else {
         return response(res, 400, false, 'Berita sudah terdaftar')
@@ -31,11 +53,35 @@ module.exports = {
       const existingNews = await News.findOne({ where: { id } })
 
       if (existingNews) {
-        const result = await News.update(payload, { where: { id } })
-        if (result) {
-          return response(res, 200, true, 'Berita berhasil diupdate')
+        if (req.file) {
+          const tmpPathPhoto = req.file.path
+          const originalExtPhoto = req.file.originalname.split('.')[req.file.originalname.split('.').length - 1]
+          const photo = req.file.filename + '.' + originalExtPhoto
+          const targetPathPhoto = path.resolve(path.resolve(__dirname, '../../'), `public/images/berita/${photo}`)
+
+          const srcPhoto = fs.createReadStream(tmpPathPhoto)
+          const destPhoto = fs.createWriteStream(targetPathPhoto)
+
+          srcPhoto.pipe(destPhoto)
+          srcPhoto.on('end', async () => {
+            const currentImage = path.resolve(path.resolve(__dirname, '../../'), `public/images/berita/${existingNews.image}`)
+            if (fs.existsSync(currentImage)) {
+              fs.unlinkSync(currentImage)
+            }
+            const result = await News.update({ ...payload, image: photo }, { where: { id } })
+            if (result) {
+              return response(res, 200, true, 'Berita Berhasil diupdate')
+            } else {
+              return response(res, 400, false, 'Berita gagal diupdate')
+            }
+          })
         } else {
-          return response(res, 400, false, 'Berita gagal diupdate')
+          const result = await News.update(payload, { where: { id } })
+          if (result) {
+            return response(res, 200, true, 'Berita berhasil diupdate')
+          } else {
+            return response(res, 400, false, 'Berita gagal diupdate')
+          }
         }
       } else {
         return response(res, 404, false, 'Berita tidak ditemukan')
@@ -66,7 +112,7 @@ module.exports = {
       const offset = (Number(page) > 1) ? (Number(page) * limit) - limit : 0
 
       if (all) {
-        const result = await News.findAll({ attributes: ['title', 'sub_title', 'news_date'] })
+        const result = await News.findAll({ attributes: ['title', 'sub_title', 'news_date', 'image'] })
 
         return response(res, 200, true, 'List Berita', result)
       } else {
@@ -102,6 +148,11 @@ module.exports = {
 
       if (existingNews) {
         await News.destroy({ where: { id } })
+
+        const currentPhoto = path.resolve(path.resolve(__dirname, '../../'), `public/images/berita/${existingNews.image}`)
+        if (fs.existsSync(currentPhoto)) {
+          fs.unlinkSync(currentPhoto)
+        }
 
         return response(res, 200, true, 'Berita berhasil dihapus')
       } else {
