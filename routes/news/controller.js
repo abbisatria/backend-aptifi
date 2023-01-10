@@ -125,7 +125,7 @@ module.exports = {
           order: [['id', 'DESC']],
           limit: Number(limit),
           offset: Number(offset),
-          attributes: ['title', 'sub_title', 'news_date']
+          attributes: ['title', 'sub_title', 'news_date', 'image']
         })
 
         const finalResult = {
