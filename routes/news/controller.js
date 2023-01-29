@@ -112,7 +112,7 @@ module.exports = {
       const offset = (Number(page) > 1) ? (Number(page) * limit) - limit : 0
 
       if (all) {
-        const result = await News.findAll({ attributes: ['title', 'sub_title', 'news_date', 'image'] })
+        const result = await News.findAll({ attributes: ['id', 'title', 'sub_title', 'news_date', 'image'] })
 
         return response(res, 200, true, 'List Berita', result)
       } else {
@@ -125,7 +125,7 @@ module.exports = {
           order: [['id', 'DESC']],
           limit: Number(limit),
           offset: Number(offset),
-          attributes: ['title', 'sub_title', 'news_date', 'image']
+          attributes: ['id', 'title', 'sub_title', 'news_date', 'image']
         })
 
         const finalResult = {
