@@ -217,6 +217,7 @@ module.exports = {
         return response(res, 400, true, 'Username tidak terdaftar')
       }
     } catch (err) {
+      console.log('err', err)
       return response(res, 400, false, `${err.message || 'Bad Request'}`)
     }
   }
