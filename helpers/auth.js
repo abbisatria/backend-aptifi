@@ -6,7 +6,7 @@ module.exports = {
     const { authorization } = req.headers
     if (authorization && authorization.startsWith('Bearer')) {
       const token = authorization.substr(7)
-      const data = jwt.verify(token, process.env.APP_KEY)
+      const data = jwt.verify(token, '4pt1f1')
       if (data) {
         req.userData = data
         return next()

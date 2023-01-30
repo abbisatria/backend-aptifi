@@ -207,7 +207,7 @@ module.exports = {
 
       if (existingUser) {
         const compare = bcrypt.compareSync(password, existingUser.password)
-        const token = jwt.sign(existingUser.dataValues, process.env.APP_KEY)
+        const token = jwt.sign(existingUser.dataValues, '4pt1f1')
         if (compare) {
           return response(res, 200, true, 'Login berhasil', { token })
         } else {
@@ -217,7 +217,7 @@ module.exports = {
         return response(res, 400, true, 'Username tidak terdaftar')
       }
     } catch (err) {
-      console.log('err', err)
+      console.log('err')
       return response(res, 400, false, `${err.message || 'Bad Request'}`)
     }
   }
