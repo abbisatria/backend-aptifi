@@ -81,6 +81,21 @@ module.exports = {
       return response(res, 400, false, `${err.message || 'Bad Request'}`)
     }
   },
+  getDetailDownload: async (req, res) => {
+    try {
+      const { id } = req.params
+
+      const existingNews = await Download.findOne({ where: { id } })
+
+      if (existingNews) {
+        return response(res, 200, true, 'Detial Download', existingNews)
+      } else {
+        return response(res, 404, false, 'Download tidak ditemukan')
+      }
+    } catch (err) {
+      return response(res, 400, false, `${err.message || 'Bad Request'}`)
+    }
+  },
   deleteDownload: async (req, res) => {
     try {
       const { id } = req.params

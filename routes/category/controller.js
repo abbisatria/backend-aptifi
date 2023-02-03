@@ -78,6 +78,21 @@ module.exports = {
       return response(res, 400, false, `${err.message || 'Bad Request'}`)
     }
   },
+  getDetailCategory: async (req, res) => {
+    try {
+      const { id } = req.params
+
+      const existingNews = await Category.findOne({ where: { id } })
+
+      if (existingNews) {
+        return response(res, 200, true, 'Detial Kategori', existingNews)
+      } else {
+        return response(res, 404, false, 'Kategori tidak ditemukan')
+      }
+    } catch (err) {
+      return response(res, 400, false, `${err.message || 'Bad Request'}`)
+    }
+  },
   deleteCategory: async (req, res) => {
     try {
       const { id } = req.params

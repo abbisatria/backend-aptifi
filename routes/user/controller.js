@@ -173,6 +173,21 @@ module.exports = {
       return response(res, 400, false, `${err.message || 'Bad Request'}`)
     }
   },
+  getDetailUser: async (req, res) => {
+    try {
+      const { id } = req.params
+
+      const existingNews = await User.findOne({ where: { id } })
+
+      if (existingNews) {
+        return response(res, 200, true, 'Detial User', existingNews)
+      } else {
+        return response(res, 404, false, 'User tidak ditemukan')
+      }
+    } catch (err) {
+      return response(res, 400, false, `${err.message || 'Bad Request'}`)
+    }
+  },
   deleteUser: async (req, res) => {
     try {
       const { id } = req.params
@@ -200,6 +215,7 @@ module.exports = {
     }
   },
   login: async (req, res) => {
+    console.log('masuk')
     try {
       const { username, password } = req.body
 
